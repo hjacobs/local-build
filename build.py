@@ -46,8 +46,6 @@ with tempfile.TemporaryDirectory(prefix='local-builder') as tempdir:
         fd.write('''#!/bin/bash
 set -e
 set -x
-apt-get update
-apt-get install -y software-properties-common
 cp -va /workspace-src /workspace
 cd /workspace/
 ''')
@@ -55,7 +53,7 @@ cd /workspace/
             fd.write('/build-steps/build-step-{}.sh\n'.format(i))
     run_sh.chmod(0o755)
 
-    with subprocess.Popen(['/usr/bin/docker', 'run', '-it', '-v', '{}:/build-steps'.format(tempdir), '-v', '{}:/workspace-src'.format(yaml_path.parent.absolute()), 'ubuntu:16.04', '/build-steps/run.sh'], stdout=subprocess.PIPE) as proc:
+    with subprocess.Popen(['/usr/bin/docker', 'run', '-it', '-v', '{}:/build-steps'.format(tempdir), '-v', '{}:/workspace-src'.format(yaml_path.parent.absolute()), 'ubuntu-buildbox', '/build-steps/run.sh'], stdout=subprocess.PIPE) as proc:
         while True:
             line = proc.stdout.readline()
             if not line:
